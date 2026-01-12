@@ -17,15 +17,9 @@ COPY ./tools/zajodar.42.fr.key /etc/nginx/ssl/zajodar.42.fr.key
 # Copiar configuración de Nginx
 COPY ./tools/default.conf /etc/nginx/http.d/default.conf
 
-# (Opcional) Copiar nginx.conf personalizado si lo tienes
-# COPY ./tools/nginx.conf /etc/nginx/nginx.conf
-
 # (Opcional) Copiar entrypoint personalizado si lo usas
 COPY ./tools/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 
 EXPOSE 443
-
-# Si no usas entrypoint.sh personalizado, puedes dejar solo:
-# CMD ["nginx", "-g", "daemon off;"]

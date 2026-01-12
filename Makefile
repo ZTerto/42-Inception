@@ -1,4 +1,4 @@
-.PHONY: up down clean fclean
+.PHONY: up down clean fclean test db logsdb logswordpress logsnginx
 
 # Date del banner
 DATE := $(shell date +%Y%m%d)
@@ -35,8 +35,6 @@ up:
 	@echo " - 🔧 Admin Panel:      https://zajodar.42.fr/wp-admin"
 	@echo "     👤 Admin:          zt_admin / wpadminpass"
 	@echo "     👤 Usuario:        wpuser / wpuserpass"
-	@echo " - 📂 phpMyAdmin:       https://zajodar.42.fr:5000/"
-	@echo " - 🚪 Nginx:            https://zajodar.42.fr/"
 	@echo ""
 
 down:
