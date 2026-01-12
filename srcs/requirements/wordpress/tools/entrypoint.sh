@@ -3,25 +3,13 @@ set -e
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 🚀 Starting WordPress setup..."
 
-# ⚙️ Variables hardcodeadas (puedes sustituir por ENV si prefieres)
-DB_NAME="wordpress"
-DB_USER="wp_user"
-DB_PASS="wp_pass"
-DB_HOST="mariadb:3306"
+# Cargar variables de entorno desde /.env si existe
+if [ -f "/.env" ]; then
+  export $(grep -v '^#' /.env | xargs)
+fi
 
-WP_PATH="/var/www/wordpress"
-WP_URL="https://zajodar.42.fr"
-WP_TITLE="ZT WordPress"
-WP_ADMIN="zt_admin"
-WP_ADMIN_PASS="wpadminpass"
-WP_ADMIN_EMAIL="admin@example.com"
-
-WP_USER="wpuser"
-WP_USER_EMAIL="wpuser@example.com"
-WP_USER_PASS="wpuserpass"
-
-# Esperar a que MariaDB esté lista (máx 30 intentos)
-MAX_RETRIES=30
+# Esperar a que MariaDB esté lista (máx 3 intentos)
+MAX_RETRIES=3
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] ⏳ Waiting for MariaDB to be ready..."
 i=1
 until mysqladmin ping -h"${DB_HOST%%:*}" -u"${DB_USER}" -p"${DB_PASS}" --silent; do
@@ -38,10 +26,9 @@ done
 if [ ! -f "${WP_PATH}/wp-config.php" ]; then
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] 🔧 Configurando WordPress..."
 
-  # Asegurar que el directorio tiene permisos correctos
   chown -R www-data:www-data "$WP_PATH"
 
-  # Configurar wp-config.php
+  # Crear wp-config.php
   wp core config \
     --path="$WP_PATH" \
     --dbname="$DB_NAME" \
@@ -60,16 +47,49 @@ if [ ! -f "${WP_PATH}/wp-config.php" ]; then
     --admin_email="$WP_ADMIN_EMAIL" \
     --allow-root
 
-  # Crear un usuario adicional (autor)
+  # Crear usuario adicional
   wp user create "$WP_USER" "$WP_USER_EMAIL" \
     --user_pass="$WP_USER_PASS" \
     --role=author \
     --path="$WP_PATH" \
     --allow-root
 else
-  echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✔️ WordPress ya está configurado. Skipping."
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✔️ WordPress ya está configurado. Skipping setup."
 fi
 
-# Iniciar PHP-FPM en primer plano
+# 🔁 Recrear usuarios si se fuerza desde la variable de entorno
+if [ "$FORCE_RECREATE_USERS" = "true" ]; then
+  echo "[$(date '+%Y-%m-%d %H:%M:%S')] 🔁 Recreating WordPress users..."
+
+  # Eliminar admin si existe
+  if wp user get "$WP_ADMIN" --path="$WP_PATH" --allow-root > /dev/null 2>&1; then
+    wp user delete "$WP_ADMIN" --yes --allow-root --path="$WP_PATH"
+    echo "🗑️  Usuario administrador '$WP_ADMIN' eliminado."
+  fi
+
+  # Eliminar user si existe
+  if wp user get "$WP_USER" --path="$WP_PATH" --allow-root > /dev/null 2>&1; then
+    wp user delete "$WP_USER" --yes --allow-root --path="$WP_PATH"
+    echo "🗑️  Usuario normal '$WP_USER' eliminado."
+  fi
+
+  # Crear admin
+  wp user create "$WP_ADMIN" "$WP_ADMIN_EMAIL" \
+    --user_pass="$WP_ADMIN_PASS" \
+    --role=administrator \
+    --path="$WP_PATH" \
+    --allow-root
+  echo "✅ Usuario administrador '$WP_ADMIN' creado."
+
+  # Crear usuario adicional
+  wp user create "$WP_USER" "$WP_USER_EMAIL" \
+    --user_pass="$WP_USER_PASS" \
+    --role=author \
+    --path="$WP_PATH" \
+    --allow-root
+  echo "✅ Usuario normal '$WP_USER' creado."
+fi
+
+
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 🚀 Starting PHP-FPM..."
 exec php-fpm81 -F

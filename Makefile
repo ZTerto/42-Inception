@@ -1,27 +1,8 @@
-.PHONY: up down clean fclean test db logsdb logswordpress logsnginx
-
-# Date del banner
-DATE := $(shell date +%Y%m%d)
-
-# Banner de inicio
-BANNER = \
-	@echo "══════════════════════════════════════════════════════════════════════════════════"; \
-	echo "  8P d8P 88P'888'Y88                                                          d8"; \
-	echo "  P d8P  P'  888  'Y   888 88e  888,8,  e88 88e  Y8b Y888P  ,e e,   e88'888  d88"; \
-	echo "   d8P d     888       888 888b 888 \"  d888 888b  Y8b Y8P  d88 88b d888  '8 d88888"; \
-	echo "  d8P d8     888       888 888P 888    Y888 888P   Y8b Y   888   , Y888   ,  888"; \
-	echo " d8P d88     888       888 88\"  888     \"88 88\"     888     \"YeeP\"  \"88,e8'  888"; \
-	echo "                       888                          888"; \
-	echo "                       888                          888"; \
-	echo "ZT Project v.$(DATE) ════════════════════════════════════════════════════════════"; \
-	echo ""
+.PHONY: up down clean fclean test db wordpress nginx
 
 COMPOSE_FILE=srcs/docker-compose.yml
-DOMAIN_NAME := zajodar.42.fr
-PORT_PMA := 5000
 
 up:
-	$(BANNER)
 	@echo "⛔ Cerrando contenedores existentes..."
 	@docker compose -f $(COMPOSE_FILE) down
 	@echo ""
@@ -33,7 +14,7 @@ up:
 	@echo "🔗 Accesos rápidos:"
 	@echo " - 🌐 WordPress:        https://zajodar.42.fr/"
 	@echo " - 🔧 Admin Panel:      https://zajodar.42.fr/wp-admin"
-	@echo "     👤 Admin:          zt_admin / wpadminpass"
+	@echo "     👤 Admin:          ajodar / wpadminpass"
 	@echo "     👤 Usuario:        wpuser / wpuserpass"
 	@echo ""
 
@@ -57,6 +38,14 @@ db:
 	@echo "📦 Entrando en MariaDB como root..."
 	docker exec -it mariadb mariadb -u root -p
 
+resetusers:
+	@echo "♻️  Forzando recreación de usuarios de WordPress..."
+	@sed -i 's/^FORCE_RECREATE_USERS=.*/FORCE_RECREATE_USERS=true/' srcs/.env
+	@docker compose -f srcs/docker-compose.yml restart wordpress
+	@sleep 2
+	@sed -i 's/^FORCE_RECREATE_USERS=.*/FORCE_RECREATE_USERS=false/' srcs/.env
+	@echo "✅ Usuarios recreados correctamente."
+
 
 fclean: down
 	@echo "🧹 Limpiando imágenes y volúmenes..."
@@ -66,12 +55,9 @@ test:
 	@echo "🧪 Comprobando contenedores activos:"
 	@docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
-logsdb:
-	@docker logs -f mariadb
-
-logswordpress:
+wordpress:
 	@docker logs -f wordpress
 
-logsnginx:
+nginx:
 	@docker logs -f nginx
 

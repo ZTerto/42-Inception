@@ -3,10 +3,10 @@ set -e
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 🚀 Initializing MariaDB setup..."
 
-MYSQL_DATABASE="wordpress"
-MYSQL_USER="wp_user"
-MYSQL_PASSWORD="wp_pass"
-MYSQL_ROOT_PASSWORD="rootpass"
+# Cargar variables de entorno desde /.env si existe
+if [ -f "/.env" ]; then
+  export $(grep -v '^#' /.env | xargs)
+fi
 
 mkdir -p /run/mysqld
 chown -R mysql:mysql /run/mysqld /var/lib/mysql
