@@ -1,8 +1,25 @@
-.PHONY: up down clean fclean test db wordpress nginx
+.PHONY: up down fclean test db wordpress nginx setup hosts resetusers
 
-COMPOSE_FILE=srcs/docker-compose.yml
+COMPOSE_FILE = srcs/docker-compose.yml
+DATA_PATH = /home/$(USER)/data
 
-up:
+hosts:
+	@echo "Para acceder a WordPress por dominio:"
+	@echo ""
+	@echo "Edita /etc/hosts y añade:"
+	@echo "127.0.0.1   zajodar.42.fr"
+	@echo ""
+
+setup:
+	@echo "📁 Preparando carpetas de persistencia en $(DATA_PATH)..."
+	@mkdir -p $(DATA_PATH)
+	@mkdir -p $(DATA_PATH)/mariadb
+	@mkdir -p $(DATA_PATH)/wordpress
+	@mkdir -p $(DATA_PATH)/nginx
+	@chmod -R 755 $(DATA_PATH)
+	@echo "✅ Carpetas de datos listas."
+
+up: setup
 	@echo "⛔ Cerrando contenedores existentes..."
 	@docker compose -f $(COMPOSE_FILE) down
 	@echo ""
@@ -50,6 +67,10 @@ resetusers:
 fclean: down
 	@echo "🧹 Limpiando imágenes y volúmenes..."
 	@docker system prune -af --volumes
+	@echo "🧨 Borrando datos persistentes en $(DATA_PATH)..."
+	@sudo rm -rf $(DATA_PATH)/mariadb $(DATA_PATH)/wordpress $(DATA_PATH)/nginx
+	@echo "✅ Datos persistentes borrados."
+
 
 test:
 	@echo "🧪 Comprobando contenedores activos:"

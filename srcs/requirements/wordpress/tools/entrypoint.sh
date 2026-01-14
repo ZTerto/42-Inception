@@ -8,8 +8,11 @@ if [ -f "/.env" ]; then
   export $(grep -v '^#' /.env | xargs)
 fi
 
-# Esperar a que MariaDB esté lista (máx 3 intentos)
-MAX_RETRIES=3
+# Asegurar que el path existe  ### NUEVO ###
+mkdir -p "$WP_PATH"
+
+# Esperar a que MariaDB esté lista (máx 10 intentos)
+MAX_RETRIES=10
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] ⏳ Waiting for MariaDB to be ready..."
 i=1
 until mysqladmin ping -h"${DB_HOST%%:*}" -u"${DB_USER}" -p"${DB_PASS}" --silent; do
@@ -27,6 +30,14 @@ if [ ! -f "${WP_PATH}/wp-config.php" ]; then
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] 🔧 Configurando WordPress..."
 
   chown -R www-data:www-data "$WP_PATH"
+
+  # Descargar WordPress si no existe  ### NUEVO ###
+  if [ ! -f "${WP_PATH}/wp-load.php" ]; then
+    echo "[$(date '+%Y-%m-%d %H:%M:%S')] 📥 Downloading WordPress core..."
+    wp core download \
+      --path="$WP_PATH" \
+      --allow-root
+  fi
 
   # Crear wp-config.php
   wp core config \
@@ -61,35 +72,26 @@ fi
 if [ "$FORCE_RECREATE_USERS" = "true" ]; then
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] 🔁 Recreating WordPress users..."
 
-  # Eliminar admin si existe
   if wp user get "$WP_ADMIN" --path="$WP_PATH" --allow-root > /dev/null 2>&1; then
     wp user delete "$WP_ADMIN" --yes --allow-root --path="$WP_PATH"
-    echo "🗑️  Usuario administrador '$WP_ADMIN' eliminado."
   fi
 
-  # Eliminar user si existe
   if wp user get "$WP_USER" --path="$WP_PATH" --allow-root > /dev/null 2>&1; then
     wp user delete "$WP_USER" --yes --allow-root --path="$WP_PATH"
-    echo "🗑️  Usuario normal '$WP_USER' eliminado."
   fi
 
-  # Crear admin
   wp user create "$WP_ADMIN" "$WP_ADMIN_EMAIL" \
     --user_pass="$WP_ADMIN_PASS" \
     --role=administrator \
     --path="$WP_PATH" \
     --allow-root
-  echo "✅ Usuario administrador '$WP_ADMIN' creado."
 
-  # Crear usuario adicional
   wp user create "$WP_USER" "$WP_USER_EMAIL" \
     --user_pass="$WP_USER_PASS" \
     --role=author \
     --path="$WP_PATH" \
     --allow-root
-  echo "✅ Usuario normal '$WP_USER' creado."
 fi
-
 
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 🚀 Starting PHP-FPM..."
 exec php-fpm81 -F

@@ -29,21 +29,18 @@ RUN apk update && apk add --no-cache \
   su-exec \
   tzdata
 
-# Directorio de trabajo
 WORKDIR /var/www
 
-# Crear el usuario y grupo www-data
 RUN adduser -S -u 82 -G www-data www-data || true
 
-# Instalar WP-CLI
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
     chmod +x wp-cli.phar && \
     mv wp-cli.phar /usr/local/bin/wp
 
-# Configurar PHP-FPM para escuchar en todas las interfaces
 RUN sed -i 's|listen = 127.0.0.1:9000|listen = 0.0.0.0:9000|' /etc/php81/php-fpm.d/www.conf
 
-# Copiar entrypoint
+COPY tools/php.ini /etc/php81/conf.d/99-memory-limit.ini
+
 COPY tools/entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 

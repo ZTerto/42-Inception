@@ -1,92 +1,101 @@
-# 42-Inception
+# Inception
 
-Este proyecto consiste en el despliegue de un entorno completo usando Docker y Docker Compose, siguiendo la filosofía de contenerización de 42. Se crean servicios como NGINX, WordPress y MariaDB, orquestados en una red interna.
+Proyecto del cursus de **42** cuyo objetivo es desplegar una infraestructura completa utilizando **Docker** y **Docker Compose**, siguiendo un enfoque de servicios desacoplados y configurados manualmente.
 
-## 🧱 Estructura del Proyecto
+La infraestructura está compuesta por:
+- **NGINX** como servidor web (solo HTTPS)
+- **WordPress** con PHP-FPM
+- **MariaDB** como base de datos
+- Persistencia mediante volúmenes
+- Configuración mediante variables de entorno
 
-- **NGINX**: Servidor web con SSL (HTTPS).
-- **WordPress**: CMS conectado a MariaDB.
-- **MariaDB**: Base de datos persistente para WordPress.
-- **Docker Compose**: Orquestación de servicios.
-- **Volumes**: Persistencia de datos para WordPress y MariaDB.
+---
 
-## ⚙️ Uso
+## 🌐 Dominio local (`zajodar.42.fr`)
 
-### Iniciar el proyecto
+El proyecto utiliza el dominio:
+`zajodar.42.fr`
+
+
+Para que el navegador lo resuelva correctamente en local, es necesario añadir una entrada en el archivo `/etc/hosts`.
+
+### 👉 Ayuda para configurar el dominio
+
+```bash
+make hosts
+```
+Este comando muestra las instrucciones necesarias para editar el enrutamiento local.
+
+
+### Entrada requerida en /etc/hosts
+```bash
+127.0.0.1   zajodar.42.fr
+```
+
+### 🚀 Uso del proyecto
+1️⃣ Lanzar el proyecto
+
 ```bash
 make up
 ```
+Este comando:
+Prepara las carpetas de persistencia
+Construye las imágenes Docker
+Inicia todos los contenedores en segundo plano
 
-### Apagar contenedores
+### 2️⃣ Acceso a los servicios
+
+🌐 WordPress:
+https://zajodar.42.fr
+
+🔧 Panel de administración:
+https://zajodar.42.fr/wp-admin
+
+Credenciales por defecto:
+Administrador: ajodar / wpadminpass
+Usuario: wpuser / wpuserpass
+
+
+### 🛑 Detener el proyecto
+
 ```bash
 make down
 ```
 
-### Limpiar volúmenes e imágenes
+🧹 Limpieza completa
 ```bash
 make fclean
 ```
 
-### Ver logs de servicios
+Este comando elimina:
+
+Contenedores
+Imágenes Docker
+Volúmenes
+Datos persistentes locales
+
+
+### 🧪 Comprobaciones útiles
+
+Ver contenedores activos:
 ```bash
-make logswordpress
-make logsnginx
-make logsdb
+make test
 ```
 
-### Acceder a la base de datos
+Ver logs de servicios:
 ```bash
-make db
+make nginx
+make wordpress
 ```
 
-## 🔐 Usuarios configurables desde `.env`
+### 🔐 HTTPS
+NGINX sirve el sitio exclusivamente por HTTPS utilizando un certificado SSL autofirmado, generado dinámicamente en tiempo de ejecución.
+Es normal que el navegador muestre un aviso indicando que el certificado no es de confianza.
 
-Puedes personalizar completamente los **usuarios y contraseñas de WordPress** desde el archivo `.env`:
 
-```env
-# Admin principal
-WP_ADMIN=zt_admin
-WP_ADMIN_PASS=wpadminpass
-WP_ADMIN_EMAIL=admin@example.com
-
-# Usuario secundario
-WP_USER=wpuser
-WP_USER_PASS=wpuserpass
-WP_USER_EMAIL=wpuser@example.com
-```
-
-Estos valores son aplicados automáticamente la **primera vez** que se ejecuta WordPress.
-
-Si deseas forzar su recreación (por ejemplo, para cambiar contraseñas o usuarios), puedes usar:
-
-```bash
-FORCE_RECREATE_USERS=true make wordpress
-```
-
-## 📁 Datos persistentes
-
-Los volúmenes montados aseguran que los datos no se pierdan al reiniciar los contenedores:
-
-- `./data/wordpress`
-- `./data/mariadb`
-
-## 🌐 Acceso rápido
-
-- 🌍 WordPress: https://zajodar.42.fr/
-- 🔧 Panel admin: https://zajodar.42.fr/wp-admin
-  - 👤 Usuario: `zt_admin`
-  - 🔑 Contraseña: `wpadminpass`
-
-## 📦 Requisitos
-
-- Docker
-- Docker Compose
-- Make
-
-## ❌ Bonus
-
-Este proyecto se ha centrado en los requisitos obligatorios. No se han implementado servicios opcionales (bonus).
-
----
-
-¡Proyecto completado y listo para defensa!
+### 📄 Notas técnicas
+Cada servicio se ejecuta en su propio contenedor.
+Todas las imágenes están basadas en Alpine Linux.
+No se utilizan imágenes latest.
+No se incluyen servicios adicionales no solicitados por el subject.
+La configuración se realiza mediante un archivo .env.

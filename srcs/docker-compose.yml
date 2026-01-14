@@ -35,26 +35,34 @@ services:
       - "443:443"
     volumes:
       - wordpress_data:/var/www/wordpress:ro
-      - ./requirements/nginx/tools/server.crt:/etc/ssl/certs/server.crt:ro
-      - ./requirements/nginx/tools/server.key:/etc/ssl/private/server.key:ro
+      - nginx_data:/etc/nginx/ssl
       - ./requirements/nginx/tools/default.conf:/etc/nginx/http.d/default.conf:ro
     networks:
       - inception
+
 
 volumes:
   mariadb_data:
     driver: local
     driver_opts:
       type: none
-      device: ./data/mariadb
+      device: ${DATA_PATH}/mariadb
       o: bind
 
   wordpress_data:
     driver: local
     driver_opts:
       type: none
-      device: ./data/wordpress
+      device: ${DATA_PATH}/wordpress
       o: bind
+
+  nginx_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ${DATA_PATH}/nginx
+      o: bind
+
 
 networks:
   inception:
