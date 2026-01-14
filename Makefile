@@ -22,6 +22,8 @@ setup:
 up: setup
 	@echo "⛔ Cerrando contenedores existentes..."
 	@docker compose -f $(COMPOSE_FILE) down
+	@docker compose -f srcs/docker-compose.yml down -v
+	@docker volume prune -f
 	@echo ""
 	@echo "🚀 Construyendo e iniciando el proyecto..."
 	@docker compose -f $(COMPOSE_FILE) up --build -d
