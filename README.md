@@ -51,18 +51,13 @@ sudo systemctl restart docker
 sudo usermod -aG docker $USER
 newgrp docker
 ```
-Ya se puede descargar desde: https://github.com/ZTerto/42-Inception.git
+Ya se puede clonar desde: https://github.com/ZTerto/42-Inception.git
 
-# 📝 NOTA:
-# Este último paso (usermod) requiere cerrar sesión o reiniciar para aplicarse correctamente.
-# Si quieres probar sin reiniciar, ejecuta un nuevo shell con:
-#   newgrp docker
-
-## 🌐 Dominio local (`zajodar.42.fr`)
+---
+## 🌐 Dominio local (`ajodar.42.fr`)
 
 El proyecto utiliza el dominio:
-`zajodar.42.fr`
-
+`ajodar.42.fr`
 
 Para que el navegador lo resuelva correctamente en local, es necesario añadir una entrada en el archivo `/etc/hosts`.
 
@@ -76,7 +71,7 @@ Este comando muestra las instrucciones necesarias para editar el enrutamiento lo
 
 ### Entrada requerida en /etc/hosts
 ```bash
-127.0.0.1   zajodar.42.fr
+127.0.0.1   ajodar.42.fr
 ```
 
 ### 🚀 Uso del proyecto
@@ -93,10 +88,10 @@ Inicia todos los contenedores en segundo plano
 ### 2️⃣ Acceso a los servicios
 
 🌐 WordPress:
-https://zajodar.42.fr
+https://ajodar.42.fr
 
 🔧 Panel de administración:
-https://zajodar.42.fr/wp-admin
+https://ajodar.42.fr/wp-admin
 
 Credenciales por defecto:
 Administrador: ajodar / wpadminpass

@@ -7,7 +7,7 @@ hosts:
 	@echo "Para acceder a WordPress por dominio:"
 	@echo ""
 	@echo "Edita /etc/hosts y añade:"
-	@echo "127.0.0.1   zajodar.42.fr"
+	@echo "127.0.0.1   ajodar.42.fr"
 	@echo ""
 
 setup:
@@ -35,8 +35,8 @@ up: setup
 	@echo "✅ Proyecto desplegado correctamente."
 	@echo ""
 	@echo "🔗 Accesos rápidos:"
-	@echo " - 🌐 WordPress:        https://zajodar.42.fr/"
-	@echo " - 🔧 Admin Panel:      https://zajodar.42.fr/wp-admin"
+	@echo " - 🌐 WordPress:        https://ajodar.42.fr/"
+	@echo " - 🔧 Admin Panel:      https://ajodar.42.fr/wp-admin"
 	@echo "     👤 Admin:          ajodar / wpadminpass"
 	@echo "     👤 Usuario:        wpuser / wpuserpass"
 	@echo ""
