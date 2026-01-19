@@ -49,12 +49,10 @@ sudo apt install -y \
 echo '{ "storage-driver": "vfs" }' | sudo tee /etc/docker/daemon.json > /dev/null
 sudo systemctl restart docker
 sudo usermod -aG docker $USER
-
-git clone https://github.com/ZTerto/42-Inception.git
-cd 42-Inception
-
 newgrp docker
 ```
+Ya se puede descargar desde: https://github.com/ZTerto/42-Inception.git
+
 # 📝 NOTA:
 # Este último paso (usermod) requiere cerrar sesión o reiniciar para aplicarse correctamente.
 # Si quieres probar sin reiniciar, ejecuta un nuevo shell con:

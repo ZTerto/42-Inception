@@ -23,7 +23,6 @@ setup:
 	@chmod +x srcs/requirements/wordpress/tools/entrypoint.sh || true
 	@echo "✅ Carpetas y permisos listos."
 
-
 up: setup
 	@echo "⛔ Cerrando contenedores existentes..."
 	@docker compose -f $(COMPOSE_FILE) down
