@@ -17,7 +17,12 @@ setup:
 	@mkdir -p $(DATA_PATH)/wordpress
 	@mkdir -p $(DATA_PATH)/nginx
 	@chmod -R 755 $(DATA_PATH)
-	@echo "✅ Carpetas de datos listas."
+	@echo "🔒 Dando permisos a scripts entrypoint.sh..."
+	@chmod +x srcs/requirements/mariadb/tools/entrypoint.sh || true
+	@chmod +x srcs/requirements/nginx/tools/entrypoint.sh || true
+	@chmod +x srcs/requirements/wordpress/tools/entrypoint.sh || true
+	@echo "✅ Carpetas y permisos listos."
+
 
 up: setup
 	@echo "⛔ Cerrando contenedores existentes..."
