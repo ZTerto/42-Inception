@@ -11,6 +11,55 @@ La infraestructura está compuesta por:
 
 ---
 
+## 🔧 Dependencias necesarias para funcionar
+
+```bash
+sudo apt remove docker docker-engine docker.io containerd runc
+sudo apt update && sudo apt install -y \
+    make \
+    curl \
+    ca-certificates \
+    gnupg \
+    lsb-release \
+    git
+
+sudo apt remove docker docker-engine docker.io containerd runc
+sudo mkdir -p /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+  sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+
+echo \
+  "deb [arch=$(dpkg --print-architecture) \
+  signed-by=/etc/apt/keyrings/docker.gpg] \
+  https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | \
+  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+sudo apt update
+sudo apt install -y \
+  docker-ce \
+  docker-ce-cli \
+  containerd.io \
+  docker-buildx-plugin \
+  docker-compose-plugin
+
+echo '{ "storage-driver": "vfs" }' | sudo tee /etc/docker/daemon.json > /dev/null
+sudo systemctl restart docker
+sudo usermod -aG docker $USER
+
+git clone https://github.com/ZTerto/42-Inception.git
+cd 42-Inception
+
+newgrp docker
+```
+# 📝 NOTA:
+# Este último paso (usermod) requiere cerrar sesión o reiniciar para aplicarse correctamente.
+# Si quieres probar sin reiniciar, ejecuta un nuevo shell con:
+#   newgrp docker
+
 ## 🌐 Dominio local (`zajodar.42.fr`)
 
 El proyecto utiliza el dominio:
