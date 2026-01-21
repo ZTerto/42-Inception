@@ -12,6 +12,8 @@ La infraestructura está compuesta por:
 ---
 
 ## 🔧 Dependencias necesarias para funcionar
+El proyecto **Inception** requiere una instalación limpia y actualizada de Docker y Docker Compose.  
+Los siguientes comandos eliminan posibles versiones antiguas, instalan las dependencias necesarias y configuran Docker para que pueda ser utilizado por el usuario sin privilegios de superusuario, se detallan los pasos necesarios para preparar el entorno en un sistema basado en **Ubuntu**
 
 ```bash
 sudo apt remove docker docker-engine docker.io containerd runc

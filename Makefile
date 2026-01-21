@@ -4,32 +4,27 @@ COMPOSE_FILE = srcs/docker-compose.yml
 DATA_PATH = /home/$(USER)/data
 
 hosts:
-	@echo "Para acceder a WordPress por dominio:"
+	@echo "To access WordPress using a local domain:"
 	@echo ""
-	@echo "Edita /etc/hosts y añade:"
+	@echo "Edit /etc/hosts and add the following line:"
 	@echo "127.0.0.1   ajodar.42.fr"
 	@echo ""
 
 setup:
-	@echo "📁 Preparando carpetas de persistencia en $(DATA_PATH)..."
+	@echo "📁 Preparing persistence directories in $(DATA_PATH)..."
 	@mkdir -p $(DATA_PATH)
 	@mkdir -p $(DATA_PATH)/mariadb
 	@mkdir -p $(DATA_PATH)/wordpress
 	@mkdir -p $(DATA_PATH)/nginx
 	@chmod -R 755 $(DATA_PATH)
-	@echo "🔒 Dando permisos a scripts entrypoint.sh..."
+	@echo "🔒 Ensuring entrypoint scripts are executable..."
 	@chmod +x srcs/requirements/mariadb/tools/entrypoint.sh || true
 	@chmod +x srcs/requirements/nginx/tools/entrypoint.sh || true
 	@chmod +x srcs/requirements/wordpress/tools/entrypoint.sh || true
-	@echo "✅ Carpetas y permisos listos."
+	@echo "✅ Setup completed successfully."
 
-up: setup
-	@echo "⛔ Cerrando contenedores existentes..."
-	@docker compose -f $(COMPOSE_FILE) down
-	@docker compose -f srcs/docker-compose.yml down -v
-	@docker volume prune -f
-	@echo ""
-	@echo "🚀 Construyendo e iniciando el proyecto..."
+up:
+	@echo "🚀 Building and starting the project..."
 	@docker compose -f $(COMPOSE_FILE) up --build -d
 	@echo ""
 	@echo "✅ Proyecto desplegado correctamente."
@@ -42,11 +37,13 @@ up: setup
 	@echo ""
 
 down:
-	@echo "🛑 Deteniendo y eliminando contenedores..."
+	@echo "🛑 Stopping containers..."
 	@docker compose -f $(COMPOSE_FILE) down
+	@docker compose -f srcs/docker-compose.yml down -v
+	@echo ""
 
 db:
-	@echo "\033[1;34m🧠 MariaDB CLI Tutorial:\033[0m"
+	@echo "\033[1;34m🧠 MariaDB CLI Quick Guide:\033[0m"
 	@echo " - Mostrar bases de datos:             \033[1;36mSHOW DATABASES;\033[0m"
 	@echo " - Usar una base de datos:             \033[1;36mUSE wordpress;\033[0m"
 	@echo " - Mostrar tablas:                     \033[1;36mSHOW TABLES;\033[0m"
@@ -54,32 +51,32 @@ db:
 	@echo " - Ver contenido de una tabla:         \033[1;36mSELECT * FROM wp_users;\033[0m"
 	@echo " - Salir:                              \033[1;36mexit\033[0m"
 	@echo ""
-	@echo "\033[1;34m🔐 Credenciales de acceso:\033[0m"
+	@echo "\033[1;34m🔐 Access credentials:\033[0m"
 	@echo " - Usuario:                            \033[1;36mroot\033[0m"
 	@echo " - Contraseña:                         \033[1;36mrootpass\033[0m"
 	@echo ""
-	@echo "📦 Entrando en MariaDB como root..."
+	@echo "📦 Connecting to MariaDB as root..."
 	docker exec -it mariadb mariadb -u root -p
 
 resetusers:
-	@echo "♻️  Forzando recreación de usuarios de WordPress..."
+	@echo "♻️  Forcing WordPress user recreation..."
 	@sed -i 's/^FORCE_RECREATE_USERS=.*/FORCE_RECREATE_USERS=true/' srcs/.env
 	@docker compose -f srcs/docker-compose.yml restart wordpress
 	@sleep 2
 	@sed -i 's/^FORCE_RECREATE_USERS=.*/FORCE_RECREATE_USERS=false/' srcs/.env
-	@echo "✅ Usuarios recreados correctamente."
+	@echo "✅ WordPress users recreated successfully."
 
 
 fclean: down
-	@echo "🧹 Limpiando imágenes y volúmenes..."
+	@echo "🧹 Removing Docker images and volumes..."
 	@docker system prune -af --volumes
-	@echo "🧨 Borrando datos persistentes en $(DATA_PATH)..."
+	@echo "🧨 Removing persistent data from $(DATA_PATH)..."
 	@sudo rm -rf $(DATA_PATH)/mariadb $(DATA_PATH)/wordpress $(DATA_PATH)/nginx
-	@echo "✅ Datos persistentes borrados."
+	@echo "✅ Persistent data removed successfully."
 
 
 test:
-	@echo "🧪 Comprobando contenedores activos:"
+	@echo "🧪 Checking running containers:"
 	@docker ps --format "table {{.Names}}\t{{.Status}}\t{{.Ports}}"
 
 wordpress:

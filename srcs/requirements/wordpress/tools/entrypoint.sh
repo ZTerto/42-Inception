@@ -1,17 +1,14 @@
 #!/bin/sh
 set -e
-
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 🚀 Starting WordPress setup..."
 
-# Cargar variables de entorno desde /.env si existe
+# loading environment variables from /.env file
 if [ -f "/.env" ]; then
   export $(grep -v '^#' /.env | xargs)
 fi
-
-# Asegurar que el path existe  ### NUEVO ###
 mkdir -p "$WP_PATH"
 
-# Esperar a que MariaDB esté lista (máx 10 intentos)
+# wait for MariaDB to be ready
 MAX_RETRIES=10
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] ⏳ Waiting for MariaDB to be ready..."
 i=1
@@ -25,13 +22,11 @@ until mysqladmin ping -h"${DB_HOST%%:*}" -u"${DB_USER}" -p"${DB_PASS}" --silent;
   sleep 2
 done
 
-# Configurar WordPress si no está ya configurado
+# configure WordPress if not already configured
 if [ ! -f "${WP_PATH}/wp-config.php" ]; then
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] 🔧 Configurando WordPress..."
-
   chown -R www-data:www-data "$WP_PATH"
 
-  # Descargar WordPress si no existe  ### NUEVO ###
   if [ ! -f "${WP_PATH}/wp-load.php" ]; then
     echo "[$(date '+%Y-%m-%d %H:%M:%S')] 📥 Downloading WordPress core..."
     wp core download \
@@ -39,7 +34,6 @@ if [ ! -f "${WP_PATH}/wp-config.php" ]; then
       --allow-root
   fi
 
-  # Crear wp-config.php
   wp core config \
     --path="$WP_PATH" \
     --dbname="$DB_NAME" \
@@ -48,7 +42,6 @@ if [ ! -f "${WP_PATH}/wp-config.php" ]; then
     --dbhost="$DB_HOST" \
     --allow-root
 
-  # Instalar WordPress
   wp core install \
     --path="$WP_PATH" \
     --url="$WP_URL" \
@@ -58,7 +51,6 @@ if [ ! -f "${WP_PATH}/wp-config.php" ]; then
     --admin_email="$WP_ADMIN_EMAIL" \
     --allow-root
 
-  # Crear usuario adicional
   wp user create "$WP_USER" "$WP_USER_EMAIL" \
     --user_pass="$WP_USER_PASS" \
     --role=author \
@@ -68,7 +60,7 @@ else
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✔️ WordPress ya está configurado. Skipping setup."
 fi
 
-# 🔁 Recrear usuarios si se fuerza desde la variable de entorno
+# recreate users if FORCE_RECREATE_USERS is true
 if [ "$FORCE_RECREATE_USERS" = "true" ]; then
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] 🔁 Recreating WordPress users..."
 

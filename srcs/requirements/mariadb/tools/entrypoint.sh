@@ -1,16 +1,15 @@
 #!/bin/sh
 set -e
-
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 🚀 Initializing MariaDB setup..."
 
-# Cargar variables de entorno desde /.env si existe
+# loading and check environment variables from /.env file
 if [ -f "/.env" ]; then
   export $(grep -v '^#' /.env | xargs)
 fi
-
 mkdir -p /run/mysqld
 chown -R mysql:mysql /run/mysqld /var/lib/mysql
 
+# initialize database if not already initialized
 if [ ! -d "/var/lib/mysql/mysql" ]; then
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] 📦 MariaDB data not found. Initializing..."
   mysql_install_db --user=mysql --basedir=/usr --datadir=/var/lib/mysql > /dev/null
@@ -33,6 +32,5 @@ else
   echo "[$(date '+%Y-%m-%d %H:%M:%S')] ✔️ MariaDB data already present. Skipping initialization."
 fi
 
-# ✅ Sin pasar flags (ya están en my_conf.cnf)
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] 🚀 Starting MariaDB server..."
 exec mariadbd --user=mysql --console --port=3306 --bind-address=0.0.0.0

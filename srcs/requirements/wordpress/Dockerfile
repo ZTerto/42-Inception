@@ -1,6 +1,6 @@
 FROM alpine:3.18
 
-# Instalar PHP, WP-CLI y dependencias
+# PHP and extensions installation
 RUN apk update && apk add --no-cache \
   bash \
   php81 \
@@ -30,15 +30,14 @@ RUN apk update && apk add --no-cache \
   tzdata
 
 WORKDIR /var/www
-
 RUN adduser -S -u 82 -G www-data www-data || true
 
+# Download and configure WordPress
 RUN curl -O https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar && \
     chmod +x wp-cli.phar && \
     mv wp-cli.phar /usr/local/bin/wp
 
 RUN sed -i 's|listen = 127.0.0.1:9000|listen = 0.0.0.0:9000|' /etc/php81/php-fpm.d/www.conf
-
 COPY tools/php.ini /etc/php81/conf.d/99-memory-limit.ini
 
 COPY tools/entrypoint.sh /entrypoint.sh
