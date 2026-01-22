@@ -78,7 +78,7 @@ Este comando muestra las instrucciones necesarias para editar el enrutamiento lo
 
 ### 🚀 Uso del proyecto
 0️⃣ Preparar el proyecto
-Antes de ejecutar la primera vez el proyecto se tiene que ejecutar make setup para preparar los datos que se guardan en el equipo con el contenido de mariadb, nginx y wordpress
+Antes de ejecutar la primera vez el proyecto se tiene que ejecutar make setup para preparar las carpetas que alojarán los datos que guarda mariadb, nginx y wordpress
 ```bash
 make setup
 ```
