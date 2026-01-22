@@ -19,6 +19,12 @@ make hosts
 ```
 
 ### 🚀 Puesta en marcha del proyecto
+
+Antes de ejecutar la primera vez el proyecto se tiene que ejecutar make setup para preparar las carpetas que alojarán los datos que guarda mariadb, nginx y wordpress
+```bash
+make setup
+```
+
 Para iniciar toda la infraestructura, ejecutar:
 ```bash
 make up
