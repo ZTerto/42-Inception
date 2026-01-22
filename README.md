@@ -88,9 +88,9 @@ make setup
 make up
 ```
 Este comando:
-Prepara las carpetas de persistencia
-Construye las imágenes Docker
-Inicia todos los contenedores en segundo plano
+Prepara las carpetas de persistencia,
+construye las imágenes Docker,
+inicia todos los contenedores en segundo plano
 
 ### 2️⃣ Acceso a los servicios
 
@@ -118,10 +118,10 @@ make fclean
 
 Este comando elimina:
 
-Contenedores
-Imágenes Docker
-Volúmenes
-Datos persistentes locales
+Contenedores, 
+imágenes Docker,
+volúmenes,
+datos persistentes locales
 
 
 ### 🧪 Comprobaciones útiles
