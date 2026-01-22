@@ -53,7 +53,7 @@ sudo systemctl restart docker
 sudo usermod -aG docker $USER
 newgrp docker
 ```
-Ya se puede clonar desde: https://github.com/ZTerto/42-Inception.git
+Ya se puede clonar en la terminal desde: https://github.com/ZTerto/42-Inception.git
 
 ---
 ## 🌐 Dominio local (`ajodar.42.fr`)
@@ -77,8 +77,13 @@ Este comando muestra las instrucciones necesarias para editar el enrutamiento lo
 ```
 
 ### 🚀 Uso del proyecto
-1️⃣ Lanzar el proyecto
+0️⃣ Preparar el proyecto
+Antes de ejecutar la primera vez el proyecto se tiene que ejecutar make setup para preparar los datos que se guardan en el equipo con el contenido de mariadb, nginx y wordpress
+```bash
+make setup
+```
 
+1️⃣ Lanzar el proyecto
 ```bash
 make up
 ```
